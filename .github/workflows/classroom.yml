@@ -1,0 +1,39 @@
+name: Autograding Tests
+'on':
+- push
+- repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: test
+      id: test
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: test
+        setup-command: ''
+        command: javac ArrayEnQueue.java && java ArrayEnQueue
+        input: 3 1 y 2 y 3 y 4 n
+        expected-output: "EnQueue Using Array\nEnter the number of elements to be
+          inserted:\nEnter the element to insert:\nElement is inserted\nDo you want
+          to insert(y/n):\nEnter the element to insert:\nElement is inserted\nDo you
+          want to insert(y/n):\nEnter the element to insert:\nElement is inserted\nDo
+          you want to insert(y/n):\nEnter the element to insert:\nQueue is Overflow.
+          Not possible to insert in Full Queue\nQueue Elements\n1\t2\t3\t\nDo you
+          want to insert(y/n):\nQueue Elements\n1\t2\t3"
+        comparison-method: exact
+        timeout: 10
+        max-score: 10
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        TEST_RESULTS: "${{steps.test.outputs.result}}"
+      with:
+        runners: test
